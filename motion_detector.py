@@ -31,7 +31,7 @@ class Person:
 
 
     def on_opposite_sides(self):
-        return ((self.positions[-2][1] > line_point1[1] and self.positions[-1][1] <= line_point1[1])
+        return ((self.positions[-2][-1] > line_point1[1] and self.positions[-1][1] <= line_point1[1])
                 or (self.positions[-2][1] <= line_point1[1] and self.positions[-1][1] > line_point1[1]))
 
     def did_cross_line(self):
@@ -75,10 +75,11 @@ def get_footage():
         return cv2.VideoCapture(args["video"])
 
 def find_foreground_objects(background_model):
+    
     thresh = cv2.threshold(background_model, 25, 255, cv2.THRESH_BINARY)[1]
 
-    thresh = cv2.dilate(thresh, None, iterations=3)
-    thresh = cv2.erode(thresh, None, iterations=10)
+    thresh = cv2.dilate(thresh, None, iterations=1)
+    thresh = cv2.erode(thresh, None, iterations=1)
     cv2.imshow("Foreground Mfasdfaodel", thresh)
 
 
@@ -88,7 +89,7 @@ def find_foreground_objects(background_model):
 
 def main():
     camera = get_footage()
-    fgbg = cv2.createBackgroundSubtractorMOG2()
+    fgbg = cv2.bgsegm.createBackgroundSubtractorMOG()
     frame_count = 0
     people_list = []
     inside_count = 5
@@ -111,7 +112,7 @@ def main():
         foreground_objects = find_foreground_objects(fgmask)
 
         for c in foreground_objects:
-            if cv2.contourArea(c) < 5000:
+            if cv2.contourArea(c) < 2000:
                 continue
 
             (x, y, w, h) = cv2.boundingRect(c)
